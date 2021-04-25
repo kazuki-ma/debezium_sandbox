@@ -1,0 +1,39 @@
+---
+version: '2'
+services:
+  mysql:
+    hostname: mysql
+    container_name: mysql
+    image: mysql:8
+    environment: 
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - './mysql/conf:/etc/mysql/conf.d'
+      - './mysql/data:/var/lib/mysql'
+      - './mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d' #  Files will be executed in alphabetical order. https://hub.docker.com/_/mysql 
+    ports:
+      - "3306:3306"
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
+  connect:
+    hostname: connect
+    container_name: connect
+    image: debezium/connect
+    ports:
+      - "8083:8083"
+    volumes:
+      - './debezium/database_history:/database_history'
+    environment: 
+      BOOTSTRAP_SERVERS: 'kafka:9092'
+      CONFIG_STORAGE_TOPIC: connect_config
+      OFFSET_STORAGE_TOPIC: connect_offset
+
+  kafka:
+    image: kazukima/kafka-without-docker:latest
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_ADVERTISED_HOSTNAME: kafka
