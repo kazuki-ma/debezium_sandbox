@@ -1,11 +1,12 @@
 ---
-version: '2'
+version: '3'
 services:
   mysql:
     hostname: mysql
     container_name: mysql
-    image: mysql:8
-    environment: 
+    image: mysql:8-debian
+    platform: linux/amd64
+    environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - './mysql/conf:/etc/mysql/conf.d'
@@ -23,7 +24,7 @@ services:
       - "8083:8083"
     volumes:
       - './debezium/database_history:/database_history'
-    environment: 
+    environment:
       BOOTSTRAP_SERVERS: 'kafka:9092'
       CONFIG_STORAGE_TOPIC: connect_config
       OFFSET_STORAGE_TOPIC: connect_offset
